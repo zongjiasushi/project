@@ -2,6 +2,8 @@ apiVersion: batch.tutorial.kubebuilder.io/v1
 kind: CronJob
 metadata:
   name: cronjob-sample
+  labels:
+    name: kan-test
 spec:
   schedule: "*/1 * * * *"
   startingDeadlineSeconds: 60
@@ -12,9 +14,10 @@ spec:
         spec:
           containers:
             - name: hello
-              image: busybox
+              image: bazel/driver:image
               args:
-                - /bin/sh
-                - -c
-                - date; echo Hello from the Kubernetes cluster
+                - -database=postgres://postgres:postgres@host.docker.internal:5433/postgres
+                - -promscale=http://test-promscale-connector:9201
+                - -processor-service=test-webserver:10010
+                - -cache-dir=/tmp/sentio/cache
           restartPolicy: OnFailure
